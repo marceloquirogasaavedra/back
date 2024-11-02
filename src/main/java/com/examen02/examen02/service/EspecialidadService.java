@@ -35,13 +35,12 @@ public class EspecialidadService {
 
     // Modificar una especialidad existente
     public ResponseEntity<Especialidad> update(Long id, EspecialidadDTO especialidadDTO) {
-        Optional<Especialidad> optionalEspecialidad = especialidadRepository.findByNombre(especialidadDTO.getNombre());
+        Optional<Especialidad> optionalEspecialidad = especialidadRepository.findById(id);
 
         if (optionalEspecialidad.isPresent()) {
             Especialidad especialidad = optionalEspecialidad.get();
             especialidad.setNombre(especialidadDTO.getNombre());
-            especialidad.setDescipcion(especialidadDTO.getDescripcion());
-
+            especialidad.setDescipcion(especialidadDTO.getDescripcion()); // Asegúrate de que este campo esté correcto en la entidad
             Especialidad updatedEspecialidad = especialidadRepository.save(especialidad);
             return new ResponseEntity<>(updatedEspecialidad, HttpStatus.OK);
         } else {

@@ -16,5 +16,6 @@ public class Especialidad implements Serializable {
     private Long id;
     @Column(length = 100,unique = true,nullable = false)
     private String nombre;
+    @Column(nullable = false,length = 255)
     private String descipcion;
 }
