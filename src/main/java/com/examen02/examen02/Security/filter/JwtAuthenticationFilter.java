@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -63,8 +64,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         logger.info("Autenticación exitosa");
 
-        // Obtener el usuario autenticado
+        // Obtener el usuario autenticado y su rol
         User user = (User) authResult.getPrincipal();
+        String role = user.getAuthorities().stream()
+                .findFirst()
+                .map(GrantedAuthority::getAuthority)
+                .orElse("ROLE_USER"); // Usa un rol predeterminado si no se encuentra
 
         // Generar el token JWT usando el correo electrónico del usuario
         String token = jwtUtils.generateAccessToken(user.getUsername());  // Aquí user.getUsername() es el correo
@@ -72,11 +77,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // Agregar el token en la cabecera de la respuesta
         response.addHeader("Authorization", "Bearer " + token);
 
-        // Crear la respuesta en formato JSON
+        // Crear la respuesta en formato JSON incluyendo el rol
         Map<String, Object> httpResponse = new HashMap<>();
         httpResponse.put("token", token);
         httpResponse.put("message", "Autenticación correcta");
         httpResponse.put("email", user.getUsername());  // Devuelve el correo en la respuesta
+        httpResponse.put("role", role);  // Agrega el rol en la respuesta
 
         // Configurar la respuesta HTTP
         response.getWriter().write(new ObjectMapper().writeValueAsString(httpResponse));

@@ -9,6 +9,7 @@ import com.examen02.examen02.model.Usuarios;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import com.examen02.examen02.service.RolService;
@@ -28,12 +29,12 @@ public class UsuarioController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
+    @PreAuthorize("hasRole('Administrador')")
     @GetMapping ("/listar")
     public ResponseEntity<List<Usuarios>> read() {
         return ResponseEntity.ok(usuarioService.findAll());
     }
-
+    @PreAuthorize("hasRole('Administrador')")
     @PostMapping(path = "/guardar")
     public ResponseEntity<Usuarios> crear(@RequestBody UsuarioDTO c){
 
@@ -53,12 +54,11 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
+    @PreAuthorize("hasAnyRole('Administrador','Medico','Paciente')")
     @PutMapping(path = "/cambiarcontraseña")
     public ResponseEntity<?> modificarContraseña(@RequestBody UsuarioCambioPasswordDTO usuarioDTO) {
         try {
             Usuarios usuarioModificado = usuarioService.modificarContraseña(usuarioDTO);
-
-
             return new ResponseEntity<>(usuarioModificado, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Error al modificar la contraseña: " + e.getMessage(), HttpStatus.BAD_REQUEST);

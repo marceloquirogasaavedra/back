@@ -33,7 +33,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         // Convertir el rol en una colección de GrantedAuthority
         Collection<? extends GrantedAuthority> authorities =
-                Collections.singletonList(new SimpleGrantedAuthority(userRole.getName()));
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + userRole.getName()));
+
 
         // Crear un objeto User de Spring Security
         return new User(userEntity.getCorreo(), userEntity.getPassword(), true, true, true, true, authorities);

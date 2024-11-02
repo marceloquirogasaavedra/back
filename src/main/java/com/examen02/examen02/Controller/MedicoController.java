@@ -8,10 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 
 @RestController
 @RequestMapping("medico")
@@ -25,6 +26,7 @@ public class MedicoController {
      * @param medicoDTO el DTO con los datos del médico
      * @return ResponseEntity con el médico creado o un error
      */
+    @PreAuthorize("hasAnyRole('Administrador')")
     @PostMapping(path = "/crear")
     public ResponseEntity<?> crearMedico(@RequestBody MedicoDTO medicoDTO) {
         try {
@@ -34,5 +36,9 @@ public class MedicoController {
             return new ResponseEntity<>("Error al crear el médico: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-
+    @PreAuthorize("hasAnyRole('Administrador')")
+    @GetMapping(path = "listar")
+    public ResponseEntity<List<Medico>> listarMedicos(){
+        return ResponseEntity.ok(medicoService.findAll());
+    }
 }

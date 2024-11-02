@@ -1,5 +1,6 @@
 package com.examen02.examen02.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.Data;
@@ -30,14 +31,14 @@ public class Medico  implements Serializable {
     @Column(name = "email", length = 255, nullable = false,unique = true)
     private String email;
 
-
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "id_usuario",nullable = true)
     private Usuarios id_usuario;
 
 
     @ManyToOne
-    @JoinColumn(name = "id_sucursal_especialidad", nullable = true)
+    @JoinColumn(name = "id_sucursal_especialidad", nullable = false)
     private Sucursal_Especialidad id_sucursal_especialidad;
 
 }
