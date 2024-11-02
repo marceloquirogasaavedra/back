@@ -47,9 +47,9 @@ public class MedicoService {
 //        usuario.setPassword( medicoDTO.getNombre()); // Password basado en el nombre
 
         // Buscar el rol de médico y asignarlo al usuario
-        Rol rolMedico = rolRepository.findByName("medico"); // Se asume que el nombre del rol es "medico"
+        Rol rolMedico = rolRepository.findByName("Medico"); // Se asume que el nombre del rol es "medico"
         if (rolMedico == null) {
-            throw new RuntimeException("Rol de médico no encontrado");
+            throw new RuntimeException("Rol de"+rolMedico+"no encontrado");
         }
         usuario.setId_rol(rolMedico);
 
