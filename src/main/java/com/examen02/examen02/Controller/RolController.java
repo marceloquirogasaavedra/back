@@ -26,11 +26,9 @@ public class RolController {
     @PreAuthorize("hasRole('Administrador')")
     @PostMapping(path = "/guardar")
     public ResponseEntity<Rol> crear(@RequestBody Rol c){
-
         try {
             Rol nuevo = rolService.save(c);
             return ResponseEntity.created(new URI("/usuario/guardar/"+nuevo.getId())).body(nuevo);
-
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
