@@ -41,7 +41,7 @@ public class SucursalController {
 
     // Endpoint para eliminar una sucursal
     @PreAuthorize("hasRole('Administrador')")
-    @DeleteMapping("/eliminar/")
+    @DeleteMapping("/eliminar")
     public ResponseEntity<Void> deleteSucursal(@RequestBody SucursalDTO sucursalDTO) {
         return sucursalService.delete(sucursalDTO);
     }

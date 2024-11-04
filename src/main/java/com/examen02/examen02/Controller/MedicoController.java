@@ -1,7 +1,9 @@
 package com.examen02.examen02.Controller;
 
 
+import com.examen02.examen02.DTO.MedicoConSucursalEspecialidadDTO;
 import com.examen02.examen02.DTO.MedicoDTO;
+import com.examen02.examen02.DTO.Sucursal_EspecialidadDTO;
 import com.examen02.examen02.model.Medico;
 import com.examen02.examen02.service.MedicoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,20 +23,12 @@ public class MedicoController {
     @Autowired
     private MedicoService medicoService;
 
-    /**
-     * Endpoint para crear un médico con usuario.
-     * @param medicoDTO el DTO con los datos del médico
-     * @return ResponseEntity con el médico creado o un error
-     */
+
     @PreAuthorize("hasAnyRole('Administrador')")
     @PostMapping(path = "/crear")
-    public ResponseEntity<?> crearMedico(@RequestBody MedicoDTO medicoDTO) {
-        try {
-            Medico medicoCreado = medicoService.crearMedicoConUsuario(medicoDTO);
-            return new ResponseEntity<>(medicoCreado, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Error al crear el médico: " + e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<Medico> crearMedicoConUsuario(@RequestBody MedicoConSucursalEspecialidadDTO request) {
+        Medico nuevoMedico = medicoService.crearMedicoConUsuario(request.getMedicoDTO(), request.getSucursalEspecialidadDTO());
+        return new ResponseEntity<>(nuevoMedico, HttpStatus.CREATED);
     }
     @PreAuthorize("hasAnyRole('Administrador')")
     @GetMapping(path = "listar")
