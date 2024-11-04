@@ -6,4 +6,5 @@ import lombok.Data;
 public class Sucursal_EspecialidadDTO {
     private Long id_sucursal;
     private Long id_especialidad;
+
 }
