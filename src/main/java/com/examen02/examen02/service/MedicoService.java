@@ -2,14 +2,10 @@ package com.examen02.examen02.service;
 import java.security.SecureRandom;
 import ch.qos.logback.classic.pattern.LineSeparatorConverter;
 import com.examen02.examen02.DTO.MedicoDTO;
+import com.examen02.examen02.DTO.Sucursal_EspecialidadDTO;
 import com.examen02.examen02.Security.PasswordGenerator;
-import com.examen02.examen02.model.Medico;
-import com.examen02.examen02.model.Rol;
-import com.examen02.examen02.model.Sucursal_Especialidad;
-import com.examen02.examen02.model.Usuarios;
-import com.examen02.examen02.repository.MedicoRepository;
-import com.examen02.examen02.repository.RolRepository;
-import com.examen02.examen02.repository.UsuarioRepository;
+import com.examen02.examen02.model.*;
+import com.examen02.examen02.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MedicoService {
@@ -25,10 +22,15 @@ public class MedicoService {
 
     @Autowired
     private MedicoRepository medicoRepository;
+    @Autowired
+    private  Sucursal_EspecialidadRepository sucursalEspecialidadRepository;
 
     @Autowired
     private UsuarioRepository usuarioRepository;
-
+    @Autowired
+    private SucursalRepository sucursalRepository;
+    @Autowired
+    private EspecialidadRepository especialidadRepository;
     @Autowired
     private EmailService emailService;
     @Autowired
@@ -37,19 +39,18 @@ public class MedicoService {
     private PasswordEncoder passwordEncoder;
     private static final SecureRandom random = new SecureRandom();
     @Transactional
-    public Medico crearMedicoConUsuario(@RequestBody MedicoDTO medicoDTO) {
+    public Medico crearMedicoConUsuario(@RequestBody MedicoDTO medicoDTO, @RequestBody Sucursal_EspecialidadDTO sucursalEspecialidadDTO) {
 
         // Crear el Usuario
         Usuarios usuario = new Usuarios();
         usuario.setCorreo(medicoDTO.getEmail());
         String password = PasswordGenerator.generateRandomPassword(12);
         usuario.setPassword(passwordEncoder.encode(password));
-//        usuario.setPassword( medicoDTO.getNombre()); // Password basado en el nombre
 
         // Buscar el rol de médico y asignarlo al usuario
-        Rol rolMedico = rolRepository.findByName("medico"); // Se asume que el nombre del rol es "medico"
+        Rol rolMedico = rolRepository.findByName("Medico");
         if (rolMedico == null) {
-            throw new RuntimeException("Rol de médico no encontrado");
+            throw new RuntimeException("Rol de Médico no encontrado");
         }
         usuario.setId_rol(rolMedico);
 
@@ -65,10 +66,24 @@ public class MedicoService {
         medico.setEmail(medicoDTO.getEmail());
         medico.setId_usuario(usuarioGuardado);
 
-        // Asignar id_sucursal_especialidad si es necesario
-        // medico.setId_sucursal_especialidad(sucursalEspecialidadRepository.findById(medicoDTO.getId_sucursal_especialidad()).orElseThrow());
+        // Buscar la Sucursal y Especialidad
+        Optional<Sucursal> sucursalOpt = sucursalRepository.findById(sucursalEspecialidadDTO.getId_sucursal());
+        Optional<Especialidad> especialidadOpt = especialidadRepository.findById(sucursalEspecialidadDTO.getId_especialidad());
 
-        // Guardar el medico en la base de datos
+        if (sucursalOpt.isPresent() && especialidadOpt.isPresent()) {
+            // Buscar la relación Sucursal_Especialidad existente en la base de datos
+            Optional<Sucursal_Especialidad> existingRelation = sucursalEspecialidadRepository.findBySucursalAndEspecialidad(sucursalOpt.get(), especialidadOpt.get());
+
+            if (existingRelation.isPresent()) {
+                // Asigna la relación existente al médico
+                medico.setId_sucursal_especialidad(existingRelation.get());
+            } else {
+                throw new RuntimeException("La relación entre Sucursal y Especialidad no existe.");
+            }
+        } else {
+            throw new RuntimeException("Sucursal o Especialidad no encontrada");
+        }
+
         // Guardar el medico en la base de datos
         Medico medicoCreado = medicoRepository.save(medico);
 
@@ -83,4 +98,5 @@ public class MedicoService {
 
         return medicoCreado;
     }
+
 }
