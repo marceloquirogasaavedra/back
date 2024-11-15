@@ -27,7 +27,7 @@ public class Horario implements Serializable {
 
     private Boolean estado;
     @JsonIgnore
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "id_medico",nullable = false)
     private Medico id_medico;
 }

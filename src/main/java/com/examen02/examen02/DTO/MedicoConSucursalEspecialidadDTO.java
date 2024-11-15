@@ -6,4 +6,5 @@ import lombok.Data;
 public class MedicoConSucursalEspecialidadDTO {
     private MedicoDTO medicoDTO;
     private Sucursal_EspecialidadDTO sucursalEspecialidadDTO;
+
 }

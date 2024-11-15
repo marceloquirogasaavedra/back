@@ -30,9 +30,17 @@ public class MedicoController {
         Medico nuevoMedico = medicoService.crearMedicoConUsuario(request.getMedicoDTO(), request.getSucursalEspecialidadDTO());
         return new ResponseEntity<>(nuevoMedico, HttpStatus.CREATED);
     }
-    @PreAuthorize("hasAnyRole('Administrador')")
+    @PreAuthorize("hasAnyRole('Administrador','Paciente')")
     @GetMapping(path = "listar")
     public ResponseEntity<List<Medico>> listarMedicos(){
         return ResponseEntity.ok(medicoService.findAll());
+
     }
+    @PreAuthorize("hasRole('Administrador')")
+    @PutMapping("/modificar/{id}")
+    public ResponseEntity<Medico> modificarMedico(@PathVariable Long id,@RequestBody MedicoConSucursalEspecialidadDTO medicoConSucursalEspecialidadDTO) {
+        Medico medicoActualizado = medicoService.modificarMedico(id,medicoConSucursalEspecialidadDTO.getMedicoDTO(), medicoConSucursalEspecialidadDTO.getSucursalEspecialidadDTO());
+        return ResponseEntity.ok(medicoActualizado);
+    }
+
 }
