@@ -16,5 +16,4 @@ public class PacienteDTO {
     private String telefono;
     private String email;
     private Boolean estado;
-    private Long id_usuario;
 }
